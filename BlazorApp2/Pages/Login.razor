@@ -1,0 +1,63 @@
+﻿@page "/"
+@page "/login"
+@using System.Text.Json;
+@using BlazorApp2.Service
+@inject NavigationManager _nav
+@inject NotificationService NotificationService
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+<div class="container login-container">
+    <div>
+        <RadzenFieldset>
+            <RadzenStack Orientation="Radzen.Orientation.Vertical">
+                <RadzenFormField Text="Login">
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value="@username" />
+                    </ChildContent>
+                </RadzenFormField>
+                <RadzenFormField Text="Mot de passe">
+                    <ChildContent>
+                        <RadzenPassword @bind-Value="@password" />
+                    </ChildContent>
+                </RadzenFormField>
+                <RadzenButton ButtonType="Radzen.ButtonType.Submit" Size="ButtonSize.Large" Text="Se connecter" Click="Validate"></RadzenButton>
+            </RadzenStack>
+        </RadzenFieldset>
+    </div>
+</div>
+
+@code {
+    [Inject] public IAuthenticationService authService { get; set; }
+
+    private string? username;
+    private string? password;
+    bool busy;
+
+    private async void Validate()
+    {
+
+        string signInResponse = "";
+        try
+        {
+            busy = true;
+            signInResponse = await authService.SignInAsync(username, password);
+
+            //Stockage de l'idToken dans le localStorage
+            await localStorage.SetItemAsStringAsync("idToken", signInResponse);
+            this._nav.NavigateTo("home");
+            busy = false;
+        }
+        catch (Exception ex)
+        {
+            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Erreur", Detail = ex.Message, Duration = 5000 });
+        }
+
+
+
+    }
+
+    void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
+    }
+}
