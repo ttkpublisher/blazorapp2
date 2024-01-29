@@ -33,6 +33,14 @@
     private string? password;
     bool busy;
 
+    protected override async void OnInitialized()
+    {
+        if (!String.IsNullOrEmpty(await localStorage.GetItemAsStringAsync("idToken")))
+        {
+            this._nav.NavigateTo("home");
+        }
+    }
+
     private async void Validate()
     {
 
