@@ -25,7 +25,7 @@
         </RadzenFieldset>
     </div>
 </div>
-
+<RadzenButton Size="ButtonSize.Large" Text="Rediriger" Click="RedirectCognito"></RadzenButton>
 @code {
     [Inject] public IAuthenticationService authService { get; set; }
 
@@ -59,6 +59,11 @@
 
 
 
+    }
+
+    public async void RedirectCognito()
+    {
+        this._nav.NavigateTo("https://ttkapidomain.auth.eu-west-3.amazoncognito.com/login?client_id=6f4m403a7ocbfa16275rpqn7d4&response_type=code&scope=email+openid+phone+ttkapiresourceserver%2Fmainscope&redirect_uri=https%3A%2F%2Fwww.google.fr", true);
     }
 
     void ShowNotification(NotificationMessage message)
