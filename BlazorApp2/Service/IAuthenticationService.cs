@@ -2,6 +2,7 @@
 {
     public interface IAuthenticationService
     {
+        Task<string> RefreshToken(string idToken);
         Task<string> SignInAsync(string username, string password);
     }
 }

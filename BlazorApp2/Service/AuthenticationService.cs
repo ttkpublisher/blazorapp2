@@ -18,6 +18,24 @@ namespace BlazorApp2.Service
             this.configuration = configuration;
         }
 
+        public async Task<string> RefreshToken(string idToken)
+        {
+            var request = new InitiateAuthRequest
+            {
+                AuthFlow = AuthFlowType.CUSTOM_AUTH,
+                ClientId = "6f4m403a7ocbfa16275rpqn7d4",
+                AuthParameters = new Dictionary<string, string>
+            {
+                { "TOKEN", idToken }
+            }
+            };
+
+            var response = await _cognitoProvider.InitiateAuthAsync(request);
+            return response.AuthenticationResult.IdToken;
+
+
+        }
+
         public async Task<string> SignInAsync(string username, string password)
         {
             var request = new InitiateAuthRequest
