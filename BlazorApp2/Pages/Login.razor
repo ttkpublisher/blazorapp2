@@ -16,13 +16,8 @@
 
     protected override async void OnInitialized()
     {
+        //_nav.NavigateTo("https://ttkapidomain.auth.eu-west-3.amazoncognito.com/login?client_id=6f4m403a7ocbfa16275rpqn7d4&response_type=token&scope=email+openid+phone+ttkapiresourceserver%2Fmainscope&redirect_uri=https%3A%2F%2Flocalhost%3A7149%2Fweather", true);
         _nav.NavigateTo("https://ttkapidomain.auth.eu-west-3.amazoncognito.com/login?client_id=6f4m403a7ocbfa16275rpqn7d4&response_type=token&scope=email+openid+phone+ttkapiresourceserver%2Fmainscope&redirect_uri=https%3A%2F%2Fblazorapp2.teletech-int.info%2Fweather", true);
-        var uri = _nav.ToAbsoluteUri(_nav.Uri).Query;
-        var queryParams = System.Web.HttpUtility.ParseQueryString(uri);
-
-        // Obtenez la valeur de l'id_token
-        string idToken = queryParams["id_token"].ToString();
-        await localStorage.SetItemAsStringAsync("idToken", idToken);
     }
 
     private async void Validate()

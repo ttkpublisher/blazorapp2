@@ -46,11 +46,20 @@ else
     {
         forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
 
-        var uri = _nav.ToAbsoluteUri(_nav.Uri).Query;
-        var queryParams = System.Web.HttpUtility.ParseQueryString(uri);
+        var uri = new Uri(_nav.Uri);
+
+        // Obtient le fragment de l'URL
+        var fragment = uri.Fragment;
+
+        // Extrayez le fragment sans le caractère '#'
+        var fragmentWithoutHash = fragment.TrimStart('#');
+
+        // Analysez les paramètres du fragment
+        var queryParams = System.Web.HttpUtility.ParseQueryString(fragmentWithoutHash);
 
         // Obtenez la valeur de l'id_token
-        string idToken = queryParams["id_token"].ToString();
+        var idToken = queryParams["id_token"];
+
         await localStorage.SetItemAsStringAsync("idToken", idToken);
     }
 
