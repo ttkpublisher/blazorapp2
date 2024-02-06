@@ -1,5 +1,8 @@
 ﻿@page "/weather"
 @inject HttpClient Http
+@inject NavigationManager _nav
+@inject NotificationService NotificationService
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
 
 <PageTitle>Weather</PageTitle>
 
@@ -42,6 +45,13 @@ else
     protected override async Task OnInitializedAsync()
     {
         forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+
+        var uri = _nav.ToAbsoluteUri(_nav.Uri).Query;
+        var queryParams = System.Web.HttpUtility.ParseQueryString(uri);
+
+        // Obtenez la valeur de l'id_token
+        string idToken = queryParams["id_token"].ToString();
+        await localStorage.SetItemAsStringAsync("idToken", idToken);
     }
 
     public class WeatherForecast
