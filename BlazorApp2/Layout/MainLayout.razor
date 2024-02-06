@@ -1,18 +1,26 @@
 ﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
 
-    <main>
-        <RadzenDialog />
-        <RadzenNotification />
-        <RadzenContextMenu />
-        <RadzenTooltip />
-        <NavMenu />
+@* <AuthorizeView>
+    <Authorized> *@
+        <div class="page">
+            <div class="sidebar">
+                <NavMenu />
+            </div>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+            <main>
+                <RadzenDialog />
+                <RadzenNotification />
+                <RadzenContextMenu />
+                <RadzenTooltip />
+                <NavMenu />
+
+                <article class="content px-4">
+                    @Body
+                </article>
+            </main>
+        </div>
+@*     </Authorized>
+    <NotAuthorized>
+        <BlazorApp2.Pages.Login></BlazorApp2.Pages.Login>
+    </NotAuthorized>
+</AuthorizeView> *@
