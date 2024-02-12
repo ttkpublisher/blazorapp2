@@ -1,4 +1,5 @@
 ﻿@page "/weather"
+@using BlazorApp2.Service
 @inject HttpClient Http
 @inject NavigationManager _nav
 @inject NotificationService NotificationService
@@ -42,23 +43,18 @@ else
 @code {
     private WeatherForecast[]? forecasts;
 
+    [Inject] public IAuthenticationService authService { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
 
         var uri = new Uri(_nav.Uri);
 
-        // Obtient le fragment de l'URL
-        var fragment = uri.Fragment;
+        string query = uri.Query.TrimStart('?');
+        string code = System.Web.HttpUtility.ParseQueryString(query).Get("code");
 
-        // Extrayez le fragment sans le caractère '#'
-        var fragmentWithoutHash = fragment.TrimStart('#');
-
-        // Analysez les paramètres du fragment
-        var queryParams = System.Web.HttpUtility.ParseQueryString(fragmentWithoutHash);
-
-        // Obtenez la valeur de l'id_token
-        var idToken = queryParams["id_token"];
+        string idToken = await authService.GetIdToken(code);
 
         await localStorage.SetItemAsStringAsync("idToken", idToken);
     }

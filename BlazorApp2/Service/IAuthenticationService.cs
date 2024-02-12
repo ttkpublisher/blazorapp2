@@ -4,5 +4,6 @@
     {
         Task<string> RefreshToken(string idToken);
         Task<string> SignInAsync(string username, string password);
+        Task<string> GetIdToken(string code);
     }
 }
