@@ -40,9 +40,13 @@ else
     </table>
 }
 
+@Token
+
+
 @code {
     private WeatherForecast[]? forecasts;
-
+    string? Token { get; set;
+    }
     [Inject] public IAuthenticationService authService { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -56,6 +60,7 @@ else
 
         string idToken = await authService.GetIdToken(code);
 
+        Token = idToken;
         await localStorage.SetItemAsStringAsync("idToken", idToken);
     }
 
