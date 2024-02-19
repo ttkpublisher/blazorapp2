@@ -9,36 +9,42 @@
 @code {
     [Inject] public IAuthenticationService authService { get; set; }
 
-
+    string? Token { get; set; }
     private string? username;
     private string? password;
     bool busy;
 
     protected override async void OnInitialized()
     {
-        //_nav.NavigateTo("https://ttkapidomain.auth.eu-west-3.amazoncognito.com/login?client_id=6f4m403a7ocbfa16275rpqn7d4&response_type=code&scope=email+openid+phone+ttkapiresourceserver%2Fmainscope&redirect_uri=https%3A%2F%2Flocalhost%3A7149%2Fweather", true);
-        _nav.NavigateTo("https://ttkapidomain.auth.eu-west-3.amazoncognito.com/login?client_id=6f4m403a7ocbfa16275rpqn7d4&response_type=code&scope=email+openid+phone+ttkapiresourceserver%2Fmainscope&redirect_uri=https%3A%2F%2Fblazorapp2.teletech-int.info%2Fweather", true);
+        var queryString = _nav.ToAbsoluteUri(_nav.Uri).Query;
+        
+
+        if (!string.IsNullOrEmpty(queryString) && queryString.Contains("code"))
+        {
+            var uri = new Uri(_nav.Uri);
+
+            string query = uri.Query.TrimStart('?');
+            string code = System.Web.HttpUtility.ParseQueryString(query).Get("code");
+
+            string idToken = await authService.GetIdToken(code);
+
+            Token = idToken;
+            await localStorage.SetItemAsStringAsync("idToken", idToken);
+
+            // Supprimer le paramètre "code" de l'URL
+            _nav.NavigateTo("weather", forceLoad: true);
+        }
+        else
+        {
+            //_nav.NavigateTo("https://ttkapidomain.auth.eu-west-3.amazoncognito.com/login?client_id=6f4m403a7ocbfa16275rpqn7d4&response_type=code&scope=email+openid+phone+ttkapiresourceserver%2Fmainscope&redirect_uri=https%3A%2F%2Flocalhost%3A7149%2Flogin", true);
+            //_nav.NavigateTo("https://ttkapidomain.auth.eu-west-3.amazoncognito.com/login?client_id=6f4m403a7ocbfa16275rpqn7d4&response_type=code&scope=email+openid+phone+ttkapiresourceserver%2Fmainscope&redirect_uri=https%3A%2F%2Flocalhost%3A7149%2Fweather", true);
+            _nav.NavigateTo("https://ttkapidomain.auth.eu-west-3.amazoncognito.com/login?client_id=6f4m403a7ocbfa16275rpqn7d4&response_type=code&scope=email+openid+phone+ttkapiresourceserver%2Fmainscope&redirect_uri=https%3A%2F%2Fblazorapp2.teletech-int.info%2Flogin", true);
+            //_nav.NavigateTo("https://ttkapidomain.auth.eu-west-3.amazoncognito.com/login?client_id=6f4m403a7ocbfa16275rpqn7d4&response_type=code&scope=email+openid+phone+ttkapiresourceserver%2Fmainscope&redirect_uri=https%3A%2F%2Fblazorapp2.teletech-int.info%2Fweather", true);
+        }
     }
 
     private async void Validate()
     {
-
-        string signInResponse = "";
-        try
-        {
-            busy = true;
-            signInResponse = await authService.SignInAsync(username, password);
-
-            //Stockage de l'idToken dans le localStorage
-            await localStorage.SetItemAsStringAsync("idToken", signInResponse);
-            this._nav.NavigateTo("home");
-            busy = false;
-        }
-        catch (Exception ex)
-        {
-            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Erreur", Detail = ex.Message, Duration = 5000 });
-        }
-
 
 
     }

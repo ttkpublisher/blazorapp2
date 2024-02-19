@@ -50,32 +50,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var queryString = _nav.ToAbsoluteUri(_nav.Uri).Query;
-        if (!string.IsNullOrEmpty(queryString) && queryString.Contains("code"))
-        {
-            //
-            var uri = new Uri(_nav.Uri);
-
-            string query = uri.Query.TrimStart('?');
-            string code = System.Web.HttpUtility.ParseQueryString(query).Get("code");
-
-            string idToken = await authService.GetIdToken(code);
-
-            Token = idToken;
-            await localStorage.SetItemAsStringAsync("idToken", idToken);
-
-            // Supprimer le paramètre "code" de l'URL
-            _nav.NavigateTo("weather", forceLoad: true);
-        }
-
         forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
-
-        if (String.IsNullOrEmpty(await localStorage.GetItemAsStringAsync("idToken")))
-        {
-            
-
-        }
-
+        this.Token = await localStorage.GetItemAsStringAsync("idToken");
     }
 
     public class WeatherForecast

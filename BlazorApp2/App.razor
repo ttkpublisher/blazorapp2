@@ -19,9 +19,15 @@
     private async Task CheckToken(NavigationContext context)
     {
         // Vérifiez le token lors de chaque changement de page
-        if (String.IsNullOrEmpty(await localStorage.GetItemAsStringAsync("idToken")) && _nav.ToAbsoluteUri(_nav.Uri).AbsoluteUri.Contains("weather"))
+        if (String.IsNullOrEmpty(await localStorage.GetItemAsStringAsync("idToken")) && !_nav.ToAbsoluteUri(_nav.Uri).AbsoluteUri.Contains("login"))
         {
+            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Erreur", Detail = "Vous avez été déconnecté", Duration = 5000 });
             _nav.NavigateTo("login");
         }
+    }
+
+    void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
     }
 }
