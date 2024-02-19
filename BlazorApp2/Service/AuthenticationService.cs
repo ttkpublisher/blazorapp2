@@ -72,7 +72,7 @@ namespace BlazorApp2.Service
                     { "grant_type", "authorization_code" },
                     { "client_id", "6f4m403a7ocbfa16275rpqn7d4" },
                     { "code", code },
-                    { "redirect_uri", "https://blazorapp2.teletech-int.info/weather" }
+                    { "redirect_uri", "https://localhost:7149/weather" } //https://blazorapp2.teletech-int.info/weather
                 };
 
                 // Créer le contenu form-url-encoded
