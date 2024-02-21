@@ -1,4 +1,7 @@
-﻿@inject NavigationManager _nav
+﻿@using System.IdentityModel.Tokens.Jwt
+@using BlazorApp2.Service
+@using Microsoft.IdentityModel.Tokens
+@inject NavigationManager _nav
 @inject NotificationService NotificationService
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 
@@ -16,13 +19,34 @@
 </Router>
 
 @code {
+
+    [Inject] IAuthenticationService authenticationService { get; set; }
+
     private async Task CheckToken(NavigationContext context)
     {
-        // Vérifiez le token lors de chaque changement de page
-        if (String.IsNullOrEmpty(await localStorage.GetItemAsStringAsync("idToken")) && !_nav.ToAbsoluteUri(_nav.Uri).AbsoluteUri.Contains("login"))
+        if (!_nav.ToAbsoluteUri(_nav.Uri).AbsoluteUri.Contains("login"))
         {
-            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Erreur", Detail = "Vous avez été déconnecté", Duration = 5000 });
-            _nav.NavigateTo("login");
+            string idToken = await localStorage.GetItemAsStringAsync("idToken");
+            // Vérifie la présence du token lors de chaque changement de page
+            if (String.IsNullOrEmpty(idToken))
+            {
+                ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Erreur", Detail = "Vous avez été déconnecté", Duration = 5000 });
+                _nav.NavigateTo("login");
+            }
+            else
+            {
+                if(!await authenticationService.CheckToken(idToken))
+                {
+                    _nav.NavigateTo("login");
+                }
+            }
+            // var handler = new JwtSecurityTokenHandler();
+            // var jsonToken = handler.ReadToken(idToken) as JwtSecurityToken;
+
+            // if (jsonToken.ValidTo < DateTime.UtcNow || !jsonToken.Audiences.Contains("6f4m403a7ocbfa16275rpqn7d4") || jsonToken.Issuer != "https://cognito-idp.eu-west-3.amazonaws.com/eu-west-3_BeEZ5qemS")
+            // {
+            //     _nav.NavigateTo("login", true);
+            // }
         }
     }
 

@@ -7,6 +7,12 @@ using System.Text.Json;
 using System.Text;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
+using System.Net.Http;
+using IdentityModel.Jwk;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Diagnostics;
+using System.Linq.Dynamic.Core.Tokenizer;
 
 namespace BlazorApp2.Service
 {
@@ -15,6 +21,7 @@ namespace BlazorApp2.Service
         private readonly IAmazonCognitoIdentityProvider _cognitoProvider;
         private readonly HttpClient httpClient;
         private readonly IConfiguration configuration;
+        public string apiAccess { get; set; }
         public AuthenticationService(HttpClient httpClient, IConfiguration configuration)
         {
             var awsCredentials = new Amazon.Runtime.BasicAWSCredentials("7oG#0U$dgQcREwT7", "bzlrO8suw1Zrp9P7egsZUf3u+oDpSw8HcfdvkXEs");
@@ -22,6 +29,7 @@ namespace BlazorApp2.Service
             _cognitoProvider = new AmazonCognitoIdentityProviderClient(awsCredentials, awsRegion);
             this.httpClient = httpClient;
             this.configuration = configuration;
+            this.apiAccess = this.configuration["ApiSettings:AccessApiUrl"];
         }
 
         public async Task<string> RefreshToken(string idToken)
@@ -38,8 +46,31 @@ namespace BlazorApp2.Service
 
             var response = await _cognitoProvider.InitiateAuthAsync(request);
             return response.AuthenticationResult.IdToken;
+        }
 
-
+        public async Task<bool> CheckToken(string idToken)
+        {
+            try
+            {
+                TTKToken token = new TTKToken { IdToken = idToken };
+                var request = new HttpRequestMessage(HttpMethod.Post, $"{apiAccess}Access/checktoken");
+                request.Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(token), Encoding.UTF8, "application/json");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", idToken);
+                var response = await httpClient.SendAsync(request);
+                if (!response.IsSuccessStatusCode)
+                {
+                    string errorMessage = await response.Content.ReadAsStringAsync();
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
         }
 
         public async Task<string> SignInAsync(string username, string password)
@@ -57,8 +88,6 @@ namespace BlazorApp2.Service
 
             var response = await _cognitoProvider.InitiateAuthAsync(request);
             return response.AuthenticationResult.IdToken;
-
-
         }
 
         public async Task<string> GetIdToken(string code)
@@ -72,7 +101,7 @@ namespace BlazorApp2.Service
                     { "grant_type", "authorization_code" },
                     { "client_id", "6f4m403a7ocbfa16275rpqn7d4" },
                     { "code", code },
-                    { "redirect_uri", "https://blazorapp2.teletech-int.info/login" } //https://blazorapp2.teletech-int.info/weather
+                    { "redirect_uri", "https://blazorapp2.teletech-int.info/login" } //https://blazorapp2.teletech-int.info/login  https://localhost:7149/login
                 };
 
                 // Créer le contenu form-url-encoded
@@ -110,5 +139,10 @@ namespace BlazorApp2.Service
         public string refresh_token { get; set; }
         public string token_type { get; set; }
         public int expires_in { get; set; }
+    }
+
+    public class TTKToken
+    {
+        public string IdToken { get; set; }
     }
 }

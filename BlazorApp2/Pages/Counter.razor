@@ -1,4 +1,8 @@
 ﻿@page "/counter"
+@inject HttpClient Http
+@inject NavigationManager _nav
+@inject NotificationService NotificationService
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
 
 <PageTitle>Counter</PageTitle>
 
@@ -8,11 +12,18 @@
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
+<RadzenButton Click="GoToWeather">Weather</RadzenButton>
+
 @code {
     private int currentCount = 0;
 
     private void IncrementCount()
     {
         currentCount++;
+    }
+
+    public void GoToWeather()
+    {
+        _nav.NavigateTo("weather");
     }
 }
