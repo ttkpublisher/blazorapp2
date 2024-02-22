@@ -23,6 +23,7 @@
         {
             var uri = new Uri(_nav.Uri);
 
+
             string query = uri.Query.TrimStart('?');
             string code = System.Web.HttpUtility.ParseQueryString(query).Get("code");
 
